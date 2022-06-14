@@ -23,14 +23,35 @@
 """
 # Streamlit dependencies
 import streamlit as st
-import joblib,os
+import joblib, os
 
 # Data dependencies
 import pandas as pd
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.style as style
+import re
+from textblob import TextBlob
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.corpus import stopwords
+from pprint import pprint
+from wordcloud import WordCloud
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
+
+# Preprocessing
 
 # Vectorizer
-news_vectorizer = open("resources/tfidfvect.pkl","rb")
-tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
+
+message_processor=joblib.load()
+vect = open("resources/predict_logreg_vect.pkl","rb")
+tweet_cv = joblib.load(vect) # loading your vectorizer from the pkl file
+dictionary= {-1: 'Anti-Climate Change', 0: 'Neutral', 1: 'Pro-Climate Change', 2: 'News Fact on climate Change'}
 
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
@@ -41,7 +62,7 @@ def main():
 
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
-	st.title("Tweet Classifer")
+	st.title("Team NM5 Tweet Classifier")
 	st.subheader("Climate change tweet classification")
 
 	# Creating sidebar with selection box -
@@ -70,13 +91,13 @@ def main():
 			vect_text = tweet_cv.transform([tweet_text]).toarray()
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
-			predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+			predictor = joblib.load(open(os.path.join("resources/predict_logreg_model.pkl"),"rb"))
 			prediction = predictor.predict(vect_text)
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
 			# more human interpretable.
-			st.success("Text Categorized as: {}".format(prediction))
+			st.success("Text Categorized as: {}".format(dictionary[list(prediction)[0]]))
 
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
